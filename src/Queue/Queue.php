@@ -1,6 +1,7 @@
 <?php
 namespace Mail\Queue;
 
+use Exception;
 use Doctrine\Common\Collections\ArrayCollection;
 use Mail\Db\FromEntity;
 use Mail\Db\MailEntity;
@@ -53,6 +54,7 @@ class Queue
 	/**
 	 * @param Mail $mail
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function add(Mail $mail)
 	{
@@ -73,7 +75,7 @@ class Queue
 		$this->mailEntity->setSubject($mail->getSubject());
 		$this->mailEntity->setBody($body);
 
-		return $this->saver->save($this->mailEntity);
+		$this->saver->save($this->mailEntity);
 	}
 
 	/**
