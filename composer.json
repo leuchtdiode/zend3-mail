@@ -23,7 +23,8 @@
 		"zendframework/zend-mvc-console": "^1.1",
 		"zendframework/zend-mail": "^2.10",
 		"doctrine/doctrine-orm-module": "^2.1.2",
-		"ramsey/uuid-doctrine": "^1.4"
+		"ramsey/uuid-doctrine": "^1.4",
+		"leuchtdiode/zend3-common": "^0.1"
 	},
 	"autoload": {
 		"psr-4": {
