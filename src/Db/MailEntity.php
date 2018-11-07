@@ -26,7 +26,7 @@ class MailEntity
 	private $subject;
 
 	/**
-	 * @ORM\Column(type="string", length=65535)
+	 * @ORM\Column(type="text")
 	 */
 	private $body;
 
