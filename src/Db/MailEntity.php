@@ -15,42 +15,58 @@ use Ramsey\Uuid\UuidInterface;
 class MailEntity
 {
 	/**
+	 * @var UuidInterface
+	 *
 	 * @ORM\Id
 	 * @ORM\Column(type="uuid");
 	 */
 	private $id;
 
 	/**
+	 * @var string
+	 *
 	 * @ORM\Column(type="string")
 	 */
 	private $subject;
 
 	/**
+	 * @var string
+	 *
 	 * @ORM\Column(type="text")
 	 */
 	private $body;
 
 	/**
+	 * @var DateTime
+	 *
 	 * @ORM\Column(type="datetime")
 	 */
 	private $createdAt;
 
 	/**
-	 * @ORM\Column(type="datetime")
+	 * @var DateTime|null
+	 *
+	 * @ORM\Column(type="datetime", nullable=true)
 	 */
 	private $sentAt;
 
 	/**
-	 * @ORM\Column(type="string")
+	 * @var string|null
+	 *
+	 * @ORM\Column(type="string", nullable=true)
 	 */
 	private $error;
 
 	/**
+	 * @var ArrayCollection|RecipientEntity[]
+	 *
 	 * @ORM\OneToMany(targetEntity="Mail\Db\RecipientEntity", mappedBy="mail", cascade={"all"}, orphanRemoval=true)
 	 **/
 	private $recipients;
 
 	/**
+	 * @var FromEntity
+	 *
 	 * @ORM\OneToOne(targetEntity="Mail\Db\FromEntity", mappedBy="mail", cascade={"all"}, orphanRemoval=true)
 	 **/
 	private $from;
@@ -161,7 +177,7 @@ class MailEntity
 	}
 
 	/**
-	 * @return ArrayCollection
+	 * @return ArrayCollection|RecipientEntity[]
 	 */
 	public function getRecipients()
 	{
@@ -169,7 +185,7 @@ class MailEntity
 	}
 
 	/**
-	 * @param ArrayCollection $recipients
+	 * @param ArrayCollection|RecipientEntity[] $recipients
 	 */
 	public function setRecipients($recipients)
 	{

@@ -17,27 +17,37 @@ class RecipientEntity
 	const TYPE_BCC	= 3;
 
 	/**
+	 * @var UuidInterface
+	 *
 	 * @ORM\Id
 	 * @ORM\Column(type="uuid");
 	 */
 	private $id;
 
 	/**
+	 * @var string
+	 *
 	 * @ORM\Column(type="string")
 	 */
 	private $email;
 
 	/**
+	 * @var string|null
+	 *
 	 * @ORM\Column(type="string")
 	 */
 	private $name;
 
 	/**
+	 * @var integer
+	 *
 	 * @ORM\Column(type="integer")
 	 */
 	private $type;
 
 	/**
+	 * @var MailEntity
+	 *
 	 * @ORM\ManyToOne(targetEntity="Mail\Db\MailEntity", inversedBy="recipients", cascade={"persist"})
 	 * @ORM\JoinColumn(name="mailId", referencedColumnName="id", nullable=false, onDelete="CASCADE")
 	 **/
@@ -67,7 +77,7 @@ class RecipientEntity
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getEmail()
 	{
@@ -75,7 +85,7 @@ class RecipientEntity
 	}
 
 	/**
-	 * @param mixed $email
+	 * @param string $email
 	 */
 	public function setEmail($email)
 	{
@@ -83,7 +93,7 @@ class RecipientEntity
 	}
 
 	/**
-	 * @return mixed
+	 * @return string|null
 	 */
 	public function getName()
 	{
@@ -91,7 +101,7 @@ class RecipientEntity
 	}
 
 	/**
-	 * @param mixed $name
+	 * @param string|null $name
 	 */
 	public function setName($name)
 	{
@@ -99,7 +109,7 @@ class RecipientEntity
 	}
 
 	/**
-	 * @return mixed
+	 * @return int
 	 */
 	public function getType()
 	{
@@ -107,7 +117,7 @@ class RecipientEntity
 	}
 
 	/**
-	 * @param mixed $type
+	 * @param int $type
 	 */
 	public function setType($type)
 	{

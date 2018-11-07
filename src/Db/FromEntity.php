@@ -13,22 +13,30 @@ use Ramsey\Uuid\UuidInterface;
 class FromEntity
 {
 	/**
+	 * @var UuidInterface
+	 *
 	 * @ORM\Id
 	 * @ORM\Column(type="uuid");
 	 */
 	private $id;
 
 	/**
+	 * @var string
+	 *
 	 * @ORM\Column(type="string")
 	 */
 	private $email;
 
 	/**
-	 * @ORM\Column(type="string")
+	 * @var string|null
+	 *
+	 * @ORM\Column(type="string", nullable=true)
 	 */
 	private $name;
 
 	/**
+	 * @var MailEntity
+	 *
 	 * @ORM\OneToOne(targetEntity="Mail\Db\MailEntity", inversedBy="from", cascade={"persist"})
 	 * @ORM\JoinColumn(name="mailId", referencedColumnName="id", nullable=false, onDelete="CASCADE")
 	 **/
@@ -58,7 +66,7 @@ class FromEntity
 	}
 
 	/**
-	 * @return mixed
+	 * @return string
 	 */
 	public function getEmail()
 	{
@@ -66,7 +74,7 @@ class FromEntity
 	}
 
 	/**
-	 * @param mixed $email
+	 * @param string $email
 	 */
 	public function setEmail($email)
 	{
@@ -74,7 +82,7 @@ class FromEntity
 	}
 
 	/**
-	 * @return mixed
+	 * @return string|null
 	 */
 	public function getName()
 	{
@@ -82,7 +90,7 @@ class FromEntity
 	}
 
 	/**
-	 * @param mixed $name
+	 * @param string|null $name
 	 */
 	public function setName($name)
 	{

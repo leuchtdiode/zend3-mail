@@ -50,13 +50,15 @@ class Queue
 		$this->saver = $saver;
 	}
 
+	/**
+	 * @param Mail $mail
+	 * @return bool
+	 */
 	public function add(Mail $mail)
 	{
 		$this->mail = $mail;
 
 		$body = $this->bodyCreator->forMail($mail);
-
-		#echo $body;exit;
 
 		$this->mailEntity = new MailEntity();
 
@@ -74,6 +76,9 @@ class Queue
 		return $this->saver->save($this->mailEntity);
 	}
 
+	/**
+	 * @return FromEntity
+	 */
 	private function makeFrom()
 	{
 		$mailFrom = $this->mail->getFrom();
