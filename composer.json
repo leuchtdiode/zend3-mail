@@ -26,9 +26,13 @@
 		"ramsey/uuid-doctrine": "^1.4",
 		"leuchtdiode/zend3-common": "^0.1"
 	},
+	"require-dev": {
+		"leuchtdiode/zend3-testing": "^0.1"
+	},
 	"autoload": {
 		"psr-4": {
-			"Mail\\": "src/"
+			"Mail\\": "src/",
+			"MailTest\\": "test/src/"
 		}
 	}
 }
