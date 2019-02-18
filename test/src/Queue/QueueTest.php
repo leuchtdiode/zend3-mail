@@ -5,6 +5,7 @@ use DateTime;
 use Mail\Db\MailEntityRepository;
 use Mail\Db\RecipientEntity;
 use Mail\Mail\Mail;
+use Mail\Mail\PlaceholderValues;
 use Mail\Mail\Recipient;
 use Mail\Queue\Queue;
 use Testing\BaseTestCase;
@@ -52,6 +53,10 @@ class QueueTest extends BaseTestCase
 		);
 		$mail->setLayoutTemplate('testing/mail/test-layout');
 		$mail->setContentTemplate('testing/mail/test-template');
+		$mail->setPlaceholderValues(
+			(new TestPlaceholderValues())
+				->setPlaceholder('test-placeholder')
+		);
 
 		$this->queue->add($mail);
 
@@ -123,7 +128,7 @@ class QueueTest extends BaseTestCase
 					<td style="padding: 30px 15px 20px 15px;" colspan="2">
 						<p>
 	ich bin ein test content mit einem <a href="#">link</a>
-</p>					</td>
+	test-placeholder</p>					</td>
 				</tr>
 			</table>
 		</td>
@@ -131,5 +136,33 @@ class QueueTest extends BaseTestCase
 </table>
 </body>
 </html>';
+	}
+}
+
+class TestPlaceholderValues implements PlaceholderValues
+{
+	/**
+	 * @var string
+	 */
+	private $placeholder;
+
+	/**
+	 * @param string $placeholder
+	 * @return TestPlaceholderValues
+	 */
+	public function setPlaceholder(string $placeholder): TestPlaceholderValues
+	{
+		$this->placeholder = $placeholder;
+		return $this;
+	}
+
+	/**
+	 * @return array|string
+	 */
+	public function asArray()
+	{
+		return [
+			'placeholder' => $this->placeholder
+		];
 	}
 }
