@@ -2,6 +2,8 @@
 namespace Mail\Mail\Attachment;
 
 use Exception;
+use function file_exists;
+use function file_get_contents;
 use Mail\Db\Attachment\Entity;
 
 class FileSystemHandler
@@ -29,14 +31,25 @@ class FileSystemHandler
 	{
 		$this->ensureDirectoryOrFail();
 
-		$path = sprintf(
-			'%s/%s.%s',
-			$this->getDirectory(),
-			$entity->getId(),
-			$entity->getExtension()
-		);
+		$path = $this->getPath($entity);
 
 		return file_put_contents($path, $content) !== false;
+	}
+
+	/**
+	 * @param Entity $entity
+	 * @return string|null
+	 */
+	public function read(Entity $entity)
+	{
+		$path = $this->getPath($entity);
+
+		if (!file_exists($path))
+		{
+			return null;
+		}
+
+		return file_get_contents($path);
 	}
 
 	/**
@@ -58,5 +71,19 @@ class FileSystemHandler
 		{
 			throw new Exception('Attachment store directory ' . $directory . ' does not exist or is not writable');
 		}
+	}
+
+	/**
+	 * @param Entity $entity
+	 * @return string
+	 */
+	private function getPath(Entity $entity): string
+	{
+		return sprintf(
+			'%s/%s.%s',
+			$this->getDirectory(),
+			$entity->getId(),
+			$entity->getExtension()
+		);
 	}
 }

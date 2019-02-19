@@ -6,6 +6,7 @@ use Exception;
 use Mail\Db\MailEntity;
 use Mail\Db\MailEntitySaver;
 use Mail\Db\RecipientEntity;
+use Mail\Mail\Attachment\FileSystemHandler;
 use Zend\Mail\AddressList;
 use Zend\Mail\Message as MailMessage;
 use Zend\Mail\Transport\Smtp;
@@ -25,6 +26,11 @@ class Sender
 	 * @var MailEntitySaver
 	 */
 	private $saver;
+
+	/**
+	 * @var FileSystemHandler
+	 */
+	private $attachmentFileSystemHandler;
 
 	/**
 	 * @var AddressList
@@ -49,16 +55,19 @@ class Sender
 	/**
 	 * @param array $config
 	 * @param MailEntitySaver $saver
+	 * @param FileSystemHandler $attachmentFileSystemHandler
 	 */
-	public function __construct(array $config, MailEntitySaver $saver)
+	public function __construct(array $config, MailEntitySaver $saver, FileSystemHandler $attachmentFileSystemHandler)
 	{
-		$this->config = $config;
-		$this->saver  = $saver;
+		$this->config                      = $config;
+		$this->saver                       = $saver;
+		$this->attachmentFileSystemHandler = $attachmentFileSystemHandler;
 	}
 
 	/**
 	 * @param MailEntity $mailEntity
 	 * @return bool
+	 * @throws Exception
 	 */
 	public function send(MailEntity $mailEntity)
 	{
@@ -77,9 +86,6 @@ class Sender
 			$mailParts = [
 				$text,
 			];
-
-			$mimeMessage = new MimeMessage();
-			$mimeMessage->setParts($mailParts);
 
 			$from = $mailEntity->getFrom();
 
@@ -102,18 +108,49 @@ class Sender
 			$message->setCc($this->cc);
 			$message->setBcc($this->bcc);
 
+			foreach ($mailEntity->getAttachments() as $attachmentEntity)
+			{
+				$content = $this->attachmentFileSystemHandler->read($attachmentEntity);
+
+				if (!$content)
+				{
+					continue;
+				}
+
+				$attachment = new Part($content);
+				$attachment->setType(
+					$attachmentEntity->getMimeType()
+				);
+				$attachment->setFileName(
+					utf8_decode($attachmentEntity->getName() . '.' . $attachmentEntity->getExtension())
+				);
+				$attachment->setDisposition(Mime::DISPOSITION_ATTACHMENT);
+				$attachment->setEncoding(Mime::ENCODING_BASE64);
+				$attachment->setCharset('UTF-8');
+				$attachment->setId($attachmentEntity->getId()->toString());
+
+				$mailParts[] = $attachment;
+			}
+
+			$mimeMessage = new MimeMessage();
+			$mimeMessage->setParts($mailParts);
+
 			$message->setBody($mimeMessage);
 
 			$transport->send($message);
+
+			$mailEntity->setSentAt(new DateTime());
+
+			$this->saver->save($mailEntity);
+
+			return true;
 		}
 		catch (Exception $ex)
 		{
 			$mailEntity->setError($ex->getMessage());
 		}
 
-		$mailEntity->setSentAt(new DateTime());
-
-		return $this->saver->save($mailEntity);
+		return false;
 	}
 
 	/**
