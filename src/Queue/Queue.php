@@ -3,13 +3,17 @@ namespace Mail\Queue;
 
 use Exception;
 use Doctrine\Common\Collections\ArrayCollection;
+use Mail\Db\Attachment\Entity as AttachmentEntity;
 use Mail\Db\FromEntity;
 use Mail\Db\MailEntity;
 use Mail\Db\MailEntitySaver;
 use Mail\Db\RecipientEntity;
+use Mail\Mail\Attachment\FileSystemHandler;
 use Mail\Mail\BodyCreator;
 use Mail\Mail\Mail;
 use Mail\Mail\Recipient;
+use function pathinfo;
+use const PATHINFO_FILENAME;
 
 class Queue
 {
@@ -22,6 +26,11 @@ class Queue
 	 * @var MailEntitySaver
 	 */
 	private $saver;
+
+	/**
+	 * @var FileSystemHandler
+	 */
+	private $attachmentFileSystemHandler;
 
 	/**
 	 * @var Mail
@@ -41,14 +50,17 @@ class Queue
 	/**
 	 * @param BodyCreator $bodyCreator
 	 * @param MailEntitySaver $saver
+	 * @param FileSystemHandler $attachmentFileSystemHandler
 	 */
 	public function __construct(
 		BodyCreator $bodyCreator,
-		MailEntitySaver $saver
+		MailEntitySaver $saver,
+		FileSystemHandler $attachmentFileSystemHandler
 	)
 	{
 		$this->bodyCreator = $bodyCreator;
 		$this->saver = $saver;
+		$this->attachmentFileSystemHandler = $attachmentFileSystemHandler;
 	}
 
 	/**
@@ -74,6 +86,8 @@ class Queue
 		);
 		$this->mailEntity->setSubject($mail->getSubject());
 		$this->mailEntity->setBody($body);
+
+		$this->makeAttachments();
 
 		$this->saver->save($this->mailEntity);
 	}
@@ -122,6 +136,33 @@ class Queue
 			$recipientEntity->setMail($this->mailEntity);
 
 			$this->recipients[] = $recipientEntity;
+		}
+	}
+
+	/**
+	 * @throws Exception
+	 */
+	private function makeAttachments()
+	{
+		foreach ($this->mail->getAttachments() as $attachment)
+		{
+			$fileName = $attachment->getFileName();
+
+			$attachmentEntity = new AttachmentEntity();
+			$attachmentEntity->setMail($this->mailEntity);
+			$attachmentEntity->setMimeType($attachment->getMimeType());
+			$attachmentEntity->setName(
+				pathinfo($fileName, PATHINFO_FILENAME)
+			);
+			$attachmentEntity->setExtension(
+				pathinfo($fileName, PATHINFO_EXTENSION)
+			);
+
+			$this->mailEntity
+				->getAttachments()
+				->add($attachmentEntity);
+
+			$this->attachmentFileSystemHandler->write($attachmentEntity, $attachment->getContent());
 		}
 	}
 }

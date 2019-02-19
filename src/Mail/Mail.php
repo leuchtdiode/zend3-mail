@@ -44,6 +44,11 @@ class Mail
 	private $placeholderValues;
 
 	/**
+	 * @var Attachment[]
+	 */
+	private $attachments = [];
+
+	/**
 	 * @param Recipient $recipient
 	 */
 	public function addTo(Recipient $recipient)
@@ -65,6 +70,14 @@ class Mail
 	public function addBcc(Recipient $recipient)
 	{
 		$this->bcc[] = $recipient;
+	}
+
+	/**
+	 * @param Attachment $attachment
+	 */
+	public function addAttachment(Attachment $attachment)
+	{
+		$this->attachments[] = $attachment;
 	}
 
 	/**
@@ -193,5 +206,21 @@ class Mail
 	public function setPlaceholderValues($placeholderValues)
 	{
 		$this->placeholderValues = $placeholderValues;
+	}
+
+	/**
+	 * @return Attachment[]
+	 */
+	public function getAttachments(): array
+	{
+		return $this->attachments;
+	}
+
+	/**
+	 * @param Attachment[] $attachments
+	 */
+	public function setAttachments(array $attachments): void
+	{
+		$this->attachments = $attachments;
 	}
 }

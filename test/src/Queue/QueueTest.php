@@ -2,8 +2,11 @@
 namespace MailTest\Queue;
 
 use DateTime;
+use Exception;
+use Mail\Db\Attachment\Entity;
 use Mail\Db\MailEntityRepository;
 use Mail\Db\RecipientEntity;
+use Mail\Mail\Attachment;
 use Mail\Mail\Mail;
 use Mail\Mail\PlaceholderValues;
 use Mail\Mail\Recipient;
@@ -25,9 +28,14 @@ class QueueTest extends BaseTestCase
 		parent::setUp();
 
 		$this->queue = $this->getInstance(Queue::class);
+
+		$this->cleanUpAttachmentsDir();
 	}
 
-	public function test_me()
+	/**
+	 * @throws Exception
+	 */
+	public function test_database_gets_filled_correct()
 	{
 		$mail = new Mail();
 		$mail->setSubject('test betreff');
@@ -56,6 +64,18 @@ class QueueTest extends BaseTestCase
 		$mail->setPlaceholderValues(
 			(new TestPlaceholderValues())
 				->setPlaceholder('test-placeholder')
+		);
+		$mail->setAttachments(
+			[
+				Attachment::create()
+					->setContent('attachment1')
+					->setFileName('Anhang1.pdf')
+					->setMimeType('application/pdf'),
+				Attachment::create()
+					->setContent('attachment1')
+					->setFileName('Bild1.png')
+					->setMimeType('image/png')
+			]
 		);
 
 		$this->queue->add($mail);
@@ -101,6 +121,42 @@ class QueueTest extends BaseTestCase
 		$this->assertEquals('bcc-recipient2@anything.com', $recipients[4]->getEmail());
 		$this->assertEquals('BCC-Empfänger2', $recipients[4]->getName());
 		$this->assertEquals(RecipientEntity::TYPE_BCC, $recipients[4]->getType());
+
+		$attachments = $entity->getAttachments();
+
+		$this->assertCount(2, $attachments);
+
+		$this->assertEquals('Anhang1', $attachments[0]->getName());
+		$this->assertEquals('pdf', $attachments[0]->getExtension());
+		$this->assertEquals('application/pdf', $attachments[0]->getMimeType());
+
+		$this->assertEquals('Bild1', $attachments[1]->getName());
+		$this->assertEquals('png', $attachments[1]->getExtension());
+		$this->assertEquals('image/png', $attachments[1]->getMimeType());
+
+		$this->assertAttachmentExistsOnFileSystem($attachments[0]);
+		$this->assertAttachmentExistsOnFileSystem($attachments[1]);
+	}
+
+	/**
+	 *
+	 */
+	private function cleanUpAttachmentsDir()
+	{
+		$config = $this->getInstance('config');
+
+		foreach (glob($config['mail']['attachment']['storeDirectory'] . '/*') as $path)
+		{
+			unlink($path);
+		}
+	}
+
+	/**
+	 * @param Entity $entity
+	 */
+	private function assertAttachmentExistsOnFileSystem(Entity $entity)
+	{
+		$this->assertFileExists(__DIR__ . '/../../../data/testing/attachments/' . $entity->getId() . '.' . $entity->getExtension());
 	}
 
 	/**

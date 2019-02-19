@@ -4,6 +4,7 @@ namespace Mail\Db;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
+use Mail\Db\Attachment\Entity as AttachmentEntity;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -72,12 +73,20 @@ class MailEntity
 	private $from;
 
 	/**
+	 * @var ArrayCollection|AttachmentEntity[]
+	 *
+	 * @ORM\OneToMany(targetEntity="Mail\Db\Attachment\Entity", mappedBy="mail", cascade={"all"}, orphanRemoval=true)
+	 **/
+	private $attachments;
+
+	/**
 	 */
 	public function __construct()
 	{
-		$this->id 			= Uuid::uuid4();
-		$this->createdAt 	= new DateTime();
-		$this->recipients 	= new ArrayCollection();
+		$this->id          = Uuid::uuid4();
+		$this->createdAt   = new DateTime();
+		$this->recipients  = new ArrayCollection();
+		$this->attachments = new ArrayCollection();
 	}
 
 	/**
@@ -206,5 +215,21 @@ class MailEntity
 	public function setFrom($from)
 	{
 		$this->from = $from;
+	}
+
+	/**
+	 * @return ArrayCollection|AttachmentEntity[]
+	 */
+	public function getAttachments()
+	{
+		return $this->attachments;
+	}
+
+	/**
+	 * @param ArrayCollection|AttachmentEntity[] $attachments
+	 */
+	public function setAttachments($attachments): void
+	{
+		$this->attachments = $attachments;
 	}
 }

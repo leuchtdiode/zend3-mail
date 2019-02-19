@@ -30,5 +30,10 @@ return [
 				],
 			]
 		]
-	]
+	],
+	'mail' => [
+		'attachment' => [
+			'storeDirectory' => __DIR__ . '/../../data/testing/attachments'
+		],
+	],
 ];
