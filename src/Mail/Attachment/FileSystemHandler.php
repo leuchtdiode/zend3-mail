@@ -57,7 +57,7 @@ class FileSystemHandler
 	 */
 	private function getDirectory()
 	{
-		return $this->config['mail']['attachment']['storeDirectory'];
+		return $this->config['mail']['attachment']['storeDirectory'] ?? null;
 	}
 
 	/**
@@ -67,7 +67,7 @@ class FileSystemHandler
 	{
 		$directory = $this->getDirectory();
 
-		if (!file_exists($directory) || !is_writable($directory))
+		if (!$directory || !file_exists($directory) || !is_writable($directory))
 		{
 			throw new Exception('Attachment store directory ' . $directory . ' does not exist or is not writable');
 		}
