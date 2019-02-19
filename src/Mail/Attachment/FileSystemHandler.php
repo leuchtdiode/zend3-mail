@@ -48,7 +48,7 @@ class FileSystemHandler
 	}
 
 	/**
-	 *
+	 * @throws Exception
 	 */
 	private function ensureDirectoryOrFail()
 	{
