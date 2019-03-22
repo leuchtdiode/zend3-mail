@@ -24,7 +24,7 @@
 		"zendframework/zend-mail": "^2.10",
 		"doctrine/doctrine-orm-module": "^2.1.2",
 		"ramsey/uuid-doctrine": "^1.4",
-		"leuchtdiode/zend3-common": "^0.1"
+		"leuchtdiode/zend3-common": "^1.0"
 	},
 	"require-dev": {
 		"leuchtdiode/zend3-testing": "^0.1"
