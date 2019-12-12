@@ -24,6 +24,11 @@ class Mail
 	private $from;
 
 	/**
+	 * @var Recipient|null
+	 */
+	private $replyTo;
+
+	/**
 	 * @var string
 	 */
 	private $subject;
@@ -113,6 +118,14 @@ class Mail
 	}
 
 	/**
+	 * @param Recipient|null $replyTo
+	 */
+	public function setReplyTo(?Recipient $replyTo)
+	{
+		$this->replyTo = $replyTo;
+	}
+
+	/**
 	 * @param string $subject
 	 */
 	public function setSubject(string $subject)
@@ -166,6 +179,14 @@ class Mail
 	public function getFrom(): Recipient
 	{
 		return $this->from;
+	}
+
+	/**
+	 * @return Recipient|null
+	 */
+	public function getReplyTo(): ?Recipient
+	{
+		return $this->replyTo;
 	}
 
 	/**

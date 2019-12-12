@@ -100,7 +100,18 @@ class Sender
 				$from->getEmail(),
 				$from->getName()
 			);
-			$message->setReplyTo($from->getEmail());
+
+			if (($replyTo = $mailEntity->getReplyTo()))
+			{
+				$message->setReplyTo(
+					$replyTo->getEmail(),
+					$replyTo->getName()
+				);
+			}
+			else
+			{
+				$message->setReplyTo($from->getEmail());
+			}
 
 			$this->loadRecipients($mailEntity);
 

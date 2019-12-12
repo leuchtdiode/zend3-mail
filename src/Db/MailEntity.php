@@ -73,6 +73,13 @@ class MailEntity
 	private $from;
 
 	/**
+	 * @var ReplyToEntity|null
+	 *
+	 * @ORM\OneToOne(targetEntity="Mail\Db\ReplyToEntity", mappedBy="mail", cascade={"all"}, orphanRemoval=true)
+	 **/
+	private $replyTo;
+
+	/**
 	 * @var ArrayCollection|AttachmentEntity[]
 	 *
 	 * @ORM\OneToMany(targetEntity="Mail\Db\Attachment\Entity", mappedBy="mail", cascade={"all"}, orphanRemoval=true)
@@ -215,6 +222,22 @@ class MailEntity
 	public function setFrom($from)
 	{
 		$this->from = $from;
+	}
+
+	/**
+	 * @return ReplyToEntity|null
+	 */
+	public function getReplyTo()
+	{
+		return $this->replyTo;
+	}
+
+	/**
+	 * @param ReplyToEntity|null $replyTo
+	 */
+	public function setReplyTo($replyTo)
+	{
+		$this->replyTo = $replyTo;
 	}
 
 	/**

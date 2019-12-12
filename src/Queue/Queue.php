@@ -8,12 +8,11 @@ use Mail\Db\FromEntity;
 use Mail\Db\MailEntity;
 use Mail\Db\MailEntitySaver;
 use Mail\Db\RecipientEntity;
+use Mail\Db\ReplyToEntity;
 use Mail\Mail\Attachment\FileSystemHandler;
 use Mail\Mail\BodyCreator;
 use Mail\Mail\Mail;
 use Mail\Mail\Recipient;
-use function pathinfo;
-use const PATHINFO_FILENAME;
 
 class Queue
 {
@@ -84,6 +83,9 @@ class Queue
 		$this->mailEntity->setFrom(
 			$this->makeFrom()
 		);
+		$this->mailEntity->setReplyTo(
+			$this->makeReplyTo()
+		);
 		$this->mailEntity->setSubject($mail->getSubject());
 		$this->mailEntity->setBody($body);
 
@@ -105,6 +107,26 @@ class Queue
 		$fromEntity->setMail($this->mailEntity);
 
 		return $fromEntity;
+	}
+
+	/**
+	 * @return ReplyToEntity|null
+	 */
+	private function makeReplyTo()
+	{
+		$replyTo = $this->mail->getReplyTo();
+
+		if (!$replyTo)
+		{
+			return null;
+		}
+
+		$entity = new ReplyToEntity();
+		$entity->setEmail($replyTo->getEmail());
+		$entity->setName($replyTo->getName());
+		$entity->setMail($this->mailEntity);
+
+		return $entity;
 	}
 
 	/**
